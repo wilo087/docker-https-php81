@@ -1,0 +1,11 @@
+# /*
+env/*
+Databases/
+OSTJiraSync/
+!env/apache.conf
+!env/php.ini
+
+!Dockerfile
+!docker-compose.yml
+!index.html
+!Dockerfile_PHP56

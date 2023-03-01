@@ -1,0 +1,80 @@
+version: "3"
+services:
+  httpd:
+    # platform: linux/x86_64
+    privileged: true
+    build: "."
+    image: www/httpd
+    container_name: httpd-php
+    ports:
+      - "80:80"
+    tty: true
+    volumes:
+      - ../:/var/www/localhost/htdocs
+      # - ./viva/osticket:/var/www/localhost/htdocs
+    networks:
+      - backend
+    links:
+      - mysql
+  mysql:
+    platform: linux/x86_64
+    image: mysql:5.7.30
+    container_name: mysql
+    tty: true
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_USER=wilo087
+      - MYSQL_PASSWORD=0102
+      - MYSQL_ROOT_PASSWORD=0102
+      - MYSQL_DATABASE=default_schem
+    networks:
+      - backend
+    volumes:
+      - ~/mysql_data:/var/lib/mysql
+  # mssql:
+  #   image: mcr.microsoft.com/azure-sql-edge:latest
+  #   container_name: mssql
+  #   # volumes:
+  #   #   - events_mssql:/var/opt/mssql
+  #   #   - ./setup.sql:/usr/config/setup.sql
+  #   ports:
+  #     - 1433:1433
+  #   environment:
+  #     - ACCEPT_EULA=Y
+  #     - MSSQL_USER=SA
+  #     - MSSQL_SA_PASSWORD=Wil@0102
+  #     - MSSQL_PID=Developer
+  #     - MSSQL_DB=events_service
+  #     # - MSSQL_PASSWORD=Passw@rd
+  #     # - MSSQL_DB_AUDIT_LOG=events_service_audit_log
+  # postgres:
+  #   # platform: linux/x86_64
+  #   image: postgres:12.11-alpine
+  #   container_name: postgres
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #    - ~/postgres_data:/var/lib/postgresql/data
+  phpmyadmin:
+    platform: linux/x86_64
+    image: phpmyadmin/phpmyadmin
+    container_name: pma
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: 0102
+      PMA_ARBITRARY: 1
+    depends_on:
+      - mysql
+    ports:
+      - 8181:80
+    networks:
+      - backend
+networks:
+  backend:

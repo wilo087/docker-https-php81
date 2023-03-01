@@ -1,0 +1,51 @@
+FROM centos:centos7.3.1611
+
+WORKDIR /var/www/intranet/
+
+# Installing dependencies
+# RUN yum -y update
+
+RUN yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
+  http://rpms.remirepo.net/enterprise/remi-release-7.rpm \
+  yum-utils \
+  make \
+  httpd \
+  libxml2-devel \
+  libpng-devel \
+  gcc \
+  libaio \ 
+  wget 
+
+RUN yum-config-manager --enable remi-php56
+RUN yum install -y php \
+  php-gd \
+  php-mysql \
+  php-cli \
+  php-common \
+  php-xml \
+  php-xmlrpc \
+  php-soap \
+  php-ldap \
+  php-pear \
+  php-devel \
+  php-pgsql \
+  php-bcmath \
+  php-intl \
+  php-snmp \
+  php-mcrypt \
+  php-pdo_pgsql \
+  php-memcache \
+  systemtap-sdt-devel
+
+# Initials config for omega
+COPY . /var/www/intranet/
+RUN mkdir -p /var/www/intranet/{tmp,logs}
+RUN mkdir -p /var/www/intranet/administrator/cache
+
+RUN chown -R apache:apache /var/www/intranet
+RUN ln -s /var/www/intranet/docker/intranet-apache.conf /etc/httpd/conf.d/intranet-apache.conf
+RUN ln -s /var/www/intranet/docker/intranet-php.ini /etc/httpd/conf.d/intranet-php.ini
+# COPY ./enviroment/alpha-php.ini /etc/php.d/
+
+EXPOSE 80
+CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
